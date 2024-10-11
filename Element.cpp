@@ -44,20 +44,25 @@ Element::Element(int h, int w, const vector<vector<char>>& s, const string& name
 // Конструктор копирования
 Element::Element(const Element& other) : width(other.width), height(other.height), shape(other.shape), name(other.name) {}
 
-// Метод для проверки соединения
+string Element::identify() const {
+    return "Обычный элемент: " + name;
+}
+
+// Метод для проверки соединения (частичного или полного)
 bool Element::canConnect(const Element& other) const {
     if (other.getHeight()<height||other.getWidth()<width){
         return false;
     }
     int totalConnectors = 0;
-    int matchingConnections = 0;    // Количество совпадений
+    int matchingConnections = 0;    // Количество совпадающих соединителей
 
     // Проходим по всем ячейкам
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
-            if (shape[i][j] == 'O') { 
+            if (shape[i][j] == 'O') { // Если у текущего элемента есть соединитель
                 totalConnectors++; // Увеличиваем общее количество соединителей
 
+                // Проверяем, можно ли соединить с другим элементом
                 if (i < other.getHeight() && j < other.getWidth()) {
                     if (other.getShape()[i][j] == 'O') {
                         matchingConnections++; // Найдено совпадение
@@ -88,7 +93,9 @@ string Element::getName() const {
     return name;
 }
 
-// Сеттер для имени
 void Element::setName(const string& newName) {
     name = newName;
 }
+
+
+

@@ -11,7 +11,7 @@ private:
     int height;
     int width;
     vector<vector<char>> shape; // Матрица, где 'O' - место где деталь есть, ' ' - где её нет
-    string name;
+    string name; // Имя элемента
     void validateShape() const;
 
 public:
@@ -24,9 +24,13 @@ public:
     // Конструктор копирования
     Element(const Element& other);
     
+    virtual ~Element() = default;
+    
+    virtual string identify() const;
+    
     // Метод для проверки соединения
     bool canConnect(const Element& other) const;
-
+    
     // Методы доступа
     int getHeight() const;
     int getWidth() const;

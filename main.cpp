@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include "Scheme.h"
 
 using namespace std;
 
@@ -106,6 +107,7 @@ int main() {
     soundElem.setSoundType("Буп-Буп");
     soundElem.beep();
     assert(soundElem.getSoundType() == "Буп-Буп");
+    assert(soundElemCopy.getSoundType() == "Бип-Бип");
     soundElem.setName("Звуковой Элемент 1");
     assert(soundElem.getName() == "Звуковой Элемент 1");
     
@@ -148,11 +150,12 @@ int main() {
     // Проверяем сеттер
     lightElem.setLightColor("Синий");
     assert(lightElem.getLightColor() == "Синий");
+    assert(lightElemCopy.getLightColor() == "Красный");
     lightElem.setName("Светящийся Элемент 1");
     assert(lightElem.getName() == "Светящийся Элемент 1");
     
     // Проверяем соединения
-    assert(!elem1.canConnect(lightElem));
+    assert(!soundElem.canConnect(lightElem));
     assert(!elem3.canConnect(lightElem));
     
     // Проверка методов включения и выключения
@@ -162,8 +165,69 @@ int main() {
     lightElem.turnOff();
     assert(lightElem.isLightOn()!=true);
     
+    // Начинаем тестировать схему
     
-    cout << "Все тесты успешно пройдены!" << endl;
+    // Тест конструктора по умолчанию
+    Scheme defaultScheme;
+    assert(defaultScheme.getHeight() == 1);
+    assert(defaultScheme.getWidth() == 1);
+    assert(defaultScheme.getDepth() == 1);
+    assert(defaultScheme.getName() == "Default");
+    
+    // Тест конструктора инициализации
+    Scheme scheme(2, 2, 2);
+    
+    scheme.setName("Моя схема");
+    assert(scheme.getName() == "Моя схема");
+    
+    assert(scheme.getHeight() == 2);
+    assert(scheme.getWidth() == 2);
+    assert(scheme.getDepth() == 2);
+
+    // Добавляем элементы и проверяем, что они добавлены на свои позиции
+    assert(scheme.addElement(&elem1, 0, 0, 0));
+    assert(scheme.getElement(0, 0, 0) == &elem1);
+
+    assert(scheme.addElement(&elem2, 0, 1, 0));
+    assert(scheme.getElement(0, 1, 0) == &elem2);
+
+    assert(scheme.addElement(&elemCopy, 1, 0, 0));
+    assert(scheme.getElement(1, 0, 0) == &elemCopy);
+
+    // Попытка добавить элемент на занятую позицию должна вернуть false
+    assert(!scheme.addElement(&elem3, 0, 0, 0));
+    
+    // Попытка добавить элемент на позицию на которой нельзя соединить с нижним
+    assert(!scheme.addElement(&elem3, 0, 1, 1));
+    
+    assert(scheme.addElement(&elem3, 0, 0, 1));
+    assert(scheme.getElement(0, 0, 1) == &elem3);
+    
+    assert(scheme.addElement(&lightElem, 0, 1, 1));
+    assert(lightElem.getLightColor() == "Синий");
+    
+    // Тест конструктора копирования
+    Scheme copyScheme(scheme);
+    assert(copyScheme.getName() == "Моя схема");
+    assert(copyScheme.getHeight() == 2);
+    assert(copyScheme.getWidth() == 2);
+    assert(copyScheme.getDepth() == 2);
+    scheme.setName("Оригинальная схема");
+    assert(copyScheme.getName() == "Моя схема");
+    assert(copyScheme.getElement(0, 1, 0) == &elem2);
+    
+    // Отображаем структуру схемы
+    scheme.displayStructure();
+
+    // Удаляем элемент и проверяем
+    assert(scheme.removeElement(0, 0, 0));
+    assert(scheme.getElement(0, 0, 0) == nullptr);
+
+    std::cout << "Все тесты успешно пройдены!" << std::endl;
 
     return 0;
 }
+
+
+
+
